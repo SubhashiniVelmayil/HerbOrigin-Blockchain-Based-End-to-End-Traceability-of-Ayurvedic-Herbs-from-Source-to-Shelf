@@ -1,0 +1,277 @@
+{
+  "users": [
+    {
+      "id": "usr_admin_001",
+      "fullName": "Dr. K. Ramanathan",
+      "email": "admin@herborigin.gov.in",
+      "passwordHash": "$2b$10$xgGGAC84roOAljSfrt.tjOCKA8OJhkfDlEG2LzPfSZr67PQl5.zuS",
+      "role": "Admin",
+      "phone": "+91 98401 23456",
+      "organization": "National Medicinal Plants Board (NMPB)",
+      "location": "New Delhi & Chennai",
+      "isApproved": true,
+      "createdAt": "2026-10-24T16:31:56.545Z"
+    },
+    {
+      "id": "usr_collector_001",
+      "fullName": "Murugan Palanisamy",
+      "email": "murugan@westernghatsherbs.org",
+      "passwordHash": "$2b$10$xgGGAC84roOAljSfrt.tjOCKA8OJhkfDlEG2LzPfSZr67PQl5.zuS",
+      "role": "Collector",
+      "phone": "+91 94432 10987",
+      "organization": "Anaimalai Tribal Herbal Foragers Collective",
+      "location": "Valparai, Western Ghats, Tamil Nadu",
+      "licenseNumber": "TN-WGF-2024-889",
+      "isApproved": true,
+      "createdAt": "2026-10-19T16:31:56.545Z"
+    },
+    {
+      "id": "usr_lab_001",
+      "fullName": "Dr. Ananya Sundaram, Ph.D.",
+      "email": "ananya@ayurcertlabs.in",
+      "passwordHash": "$2b$10$xgGGAC84roOAljSfrt.tjOCKA8OJhkfDlEG2LzPfSZr67PQl5.zuS",
+      "role": "LabVerifier",
+      "phone": "+91 98840 99881",
+      "organization": "AyurCert Central Phytochemical Testing Labs",
+      "location": "Bengaluru, Karnataka",
+      "licenseNumber": "NABL-AYUSH-1049",
+      "isApproved": true,
+      "createdAt": "2026-10-20T16:31:56.545Z"
+    },
+    {
+      "id": "usr_1792859529389_78bxt",
+      "fullName": "Dev Tester",
+      "email": "devtest@herbs.org",
+      "passwordHash": "$2b$10$PFWBmkw2Yn./IVS2nXBBdObe8EyL6qtPXNoh5n7DY5ab2gD6xKqqC",
+      "role": "Collector",
+      "isApproved": true,
+      "createdAt": "2026-10-24T16:32:09.497Z"
+    }
+  ],
+  "batches": [
+    {
+      "id": "batch_ash_001",
+      "batchNumber": "HO-ASH-2025-001",
+      "herbName": "Ashwagandha (Indian Ginseng)",
+      "botanicalName": "Withania somnifera",
+      "quantityKg": 120,
+      "moisturePercent": 8.4,
+      "collectionDate": "2026-10-18",
+      "collectorId": "usr_collector_001",
+      "collectorName": "Murugan Palanisamy",
+      "gpsLatitude": 10.3256,
+      "gpsLongitude": 76.9538,
+      "region": "Anaimalai Rainforest Reserve, Valparai, Tamil Nadu",
+      "elevationMeters": 1050,
+      "harvestMethod": "Sustainable Hand-Harvest of Mature Roots (Wild-Crafted)",
+      "qualityGrade": "A",
+      "photoUrl": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80",
+      "notes": "Harvested under waxing moon as per Vrkshayurveda traditions. Sun-dried on bamboo mats.",
+      "status": "Approved",
+      "blockchainHash": "e878f335d1f9cd9e04c8b046ac0acf2fc7c7edc1772bce8a5dd36e075e5c1b9c",
+      "blockNumber": 1,
+      "createdAt": "2026-10-18T16:31:56.545Z",
+      "updatedAt": "2026-10-22T16:31:56.545Z"
+    },
+    {
+      "id": "batch_tulsi_002",
+      "batchNumber": "HO-TUL-2025-002",
+      "herbName": "Krishna Tulsi (Holy Basil)",
+      "botanicalName": "Ocimum sanctum",
+      "quantityKg": 85,
+      "moisturePercent": 9.1,
+      "collectionDate": "2026-10-21",
+      "collectorId": "usr_collector_001",
+      "collectorName": "Murugan Palanisamy",
+      "gpsLatitude": 11.4064,
+      "gpsLongitude": 76.6932,
+      "region": "Nilgiri Biosphere Reserve, Tamil Nadu",
+      "elevationMeters": 1800,
+      "harvestMethod": "Selective Leaf Plucking at Dawn",
+      "qualityGrade": "A",
+      "photoUrl": "https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?auto=format&fit=crop&w=800&q=80",
+      "notes": "High essential oil concentration; dark purple Krishna variety.",
+      "status": "InTesting",
+      "blockchainHash": "be9fb5454da69be1059c37e5ac9d5d964d3f98c2c5a664b0c311971fbbf99a81",
+      "blockNumber": 1,
+      "createdAt": "2026-10-21T16:31:56.545Z",
+      "updatedAt": "2026-10-23T16:31:56.545Z"
+    }
+  ],
+  "events": [
+    {
+      "id": "evt_001",
+      "batchId": "batch_ash_001",
+      "batchNumber": "HO-ASH-2025-001",
+      "eventType": "COLLECTION",
+      "title": "Wild Harvest Completed & Geo-Tagged",
+      "description": "Roots carefully excavated, soil gently shaken off, washed in natural stream water.",
+      "location": "Anaimalai Rainforest Reserve, Valparai, Tamil Nadu",
+      "recordedByUserId": "usr_collector_001",
+      "recordedByName": "Murugan Palanisamy",
+      "actorRole": "Collector",
+      "timestamp": "2026-10-18T16:31:56.545Z",
+      "txHash": "e878f335d1f9cd9e04c8b046ac0acf2fc7c7edc1772bce8a5dd36e075e5c1b9c",
+      "blockNumber": 1
+    },
+    {
+      "id": "evt_002",
+      "batchId": "batch_ash_001",
+      "batchNumber": "HO-ASH-2025-001",
+      "eventType": "PROCESSING",
+      "title": "Shade Drying & Primary Pulverizing",
+      "description": "Moisture reduced to 8.4% in temperature-monitored solar dehydrator (<45°C) to preserve withanolides.",
+      "location": "Coimbatore Herbal Processing Hub",
+      "recordedByUserId": "usr_collector_001",
+      "recordedByName": "Murugan Palanisamy",
+      "actorRole": "Processor",
+      "timestamp": "2026-10-20T16:31:56.545Z",
+      "txHash": "cd55f8c3687bd61bdc547832afa223e04776d26e4f3a93c471c0852aac2b46b5",
+      "blockNumber": 1
+    },
+    {
+      "id": "evt_003",
+      "batchId": "batch_ash_001",
+      "batchNumber": "HO-ASH-2025-001",
+      "eventType": "LAB_TEST",
+      "title": "Ayurvedic Pharmacopoeia Compliance Certificate Issued",
+      "description": "Passed HPLC analysis for Withanolides (2.12%), zero heavy metals, zero pesticide residue.",
+      "location": "AyurCert Central Phytochemical Testing Labs",
+      "recordedByUserId": "usr_lab_001",
+      "recordedByName": "Dr. Ananya Sundaram, Ph.D.",
+      "actorRole": "LabVerifier",
+      "timestamp": "2026-10-22T16:31:56.545Z",
+      "txHash": "399cd2b6f63d1a6c3c6fc8cf2e58c432e2e642ab3be9bc596475c43b2f5f8599",
+      "blockNumber": 1
+    }
+  ],
+  "labTests": [
+    {
+      "id": "lab_test_001",
+      "batchId": "batch_ash_001",
+      "batchNumber": "HO-ASH-2025-001",
+      "testDate": "2026-10-22",
+      "labName": "AyurCert Central Phytochemical Testing Labs (NABL Accredited)",
+      "verifierUserId": "usr_lab_001",
+      "verifierName": "Dr. Ananya Sundaram, Ph.D.",
+      "moisturePercent": 8.4,
+      "pesticideResiduePpm": 0.002,
+      "heavyMetalsPass": true,
+      "ashValuePercent": 5.8,
+      "activePhytochemical": "Withanolides A & B (HPLC)",
+      "activePhytochemicalPercent": 2.12,
+      "overallStatus": "Approved",
+      "notes": "Exceeds standard pharmacopoeial purity threshold of 1.5%. Premium therapeutic grade.",
+      "certificateHash": "a16572960d9cca5a675fffe9cb5ff59126a7c3aef65f37e2ae1cea3aa4074a96",
+      "txHash": "f746397f80ef02147eb43d0cc3e48cfbe3f6dfdd26514225b640d73a4929b752",
+      "blockNumber": 1,
+      "createdAt": "2026-10-22T16:31:56.545Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "prod_ash_001",
+      "productCode": "PRD-ASH-CHURNA-500",
+      "productName": "Shuddha Ashwagandha Root Churna (Grade A Organic)",
+      "ayurvedicFormulation": "Ashwagandha Churna (Single Herb Powder)",
+      "batchIds": [
+        "batch_ash_001"
+      ],
+      "batchNumbers": [
+        "HO-ASH-2025-001"
+      ],
+      "manufacturedDate": "2026-10-23",
+      "expiryDate": "2028-10-23",
+      "manufacturerUserId": "usr_admin_001",
+      "manufacturerName": "Vaidya Herbals Ayurvedic Pharmacy Ltd.",
+      "quantityUnits": 500,
+      "packagingType": "Amber Glass Jar with Nitrogen Flush Tamper-Evident Seal",
+      "dosageInstructions": "3-6g with warm cow milk or honey twice daily before meals.",
+      "txHash": "4e5b3033ee6ba48ab21b17d43cf335165797fb13998debf1b34f3cdb059c4a20",
+      "blockNumber": 1,
+      "createdAt": "2026-10-23T16:31:56.545Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "log_1792859533322_3rnk",
+      "timestamp": "2026-10-24T16:32:13.322Z",
+      "entityType": "User",
+      "entityId": "usr_1792859529389_78bxt",
+      "action": "LOGIN",
+      "performedByUserId": "usr_1792859529389_78bxt",
+      "performedByName": "Dev Tester",
+      "role": "Collector",
+      "details": "User logged in from web client"
+    },
+    {
+      "id": "log_1792859529498_vpqo",
+      "timestamp": "2026-10-24T16:32:09.498Z",
+      "entityType": "User",
+      "entityId": "usr_1792859529389_78bxt",
+      "action": "CREATE",
+      "performedByUserId": "usr_1792859529389_78bxt",
+      "performedByName": "Dev Tester",
+      "role": "Collector",
+      "details": "User registered as Collector (devtest@herbs.org)"
+    },
+    {
+      "id": "log_001",
+      "entityType": "User",
+      "entityId": "usr_admin_001",
+      "action": "CREATE",
+      "performedByUserId": "SYSTEM",
+      "performedByName": "System Init",
+      "role": "Admin",
+      "timestamp": "2026-10-24T16:31:56.545Z",
+      "details": "Default Administrator account bootstrapped"
+    }
+  ],
+  "ledger": [
+    {
+      "blockHeight": 0,
+      "timestamp": "2026-10-17T16:31:56.545Z",
+      "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "blockHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "merkleRoot": "GENESIS_BLOCK_ROOT_HERBORIGIN",
+      "transactionsCount": 1,
+      "transactions": [
+        {
+          "txHash": "0x0000genesis",
+          "type": "GENESIS",
+          "entityId": "ROOT",
+          "description": "HerbOrigin Ayurvedic Blockchain Genesis Block Initialized",
+          "actor": "SYSTEM_ORACLE",
+          "timestamp": "2026-10-17T16:31:56.545Z"
+        }
+      ]
+    },
+    {
+      "blockHeight": 1,
+      "timestamp": "2026-10-18T16:31:56.545Z",
+      "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "blockHash": "4aecccb26925333a1fdf89d45d7e790c4618aacb396c7826cb32d4d767cc70b2",
+      "merkleRoot": "5caf8d07b4bb316bcadf748e4e988b50453a41435e036ebfeedd3c09796dbbc1",
+      "transactionsCount": 3,
+      "transactions": [
+        {
+          "txHash": "e878f335d1f9cd9e04c8b046ac0acf2fc7c7edc1772bce8a5dd36e075e5c1b9c",
+          "type": "BATCH_REGISTRATION",
+          "entityId": "batch_ash_001",
+          "description": "Batch HO-ASH-2025-001 created by Murugan Palanisamy",
+          "actor": "usr_collector_001",
+          "timestamp": "2026-10-18T16:31:56.545Z"
+        },
+        {
+          "txHash": "be9fb5454da69be1059c37e5ac9d5d964d3f98c2c5a664b0c311971fbbf99a81",
+          "type": "BATCH_REGISTRATION",
+          "entityId": "batch_tulsi_002",
+          "description": "Batch HO-TUL-2025-002 created by Murugan Palanisamy",
+          "actor": "usr_collector_001",
+          "timestamp": "2026-10-21T16:31:56.545Z"
+        }
+      ]
+    }
+  ],
+  "passwordResetTokens": []
+}

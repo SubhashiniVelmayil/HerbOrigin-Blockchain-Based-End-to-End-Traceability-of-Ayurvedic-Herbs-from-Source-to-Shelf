@@ -1,0 +1,6 @@
+{
+  "name": "HerbOrigin: Blockchain-Based End-to-End Traceability of Ayurvedic Herbs from Source to Shelf",
+  "description": "Complete end-to-end traceability system for Ayurvedic medicinal herbs with multi-role access (Collectors, Processors, Labs, Manufacturers, Consumers), cryptographic ledger, QR verification, Tamil and English language support, and offline capabilities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
