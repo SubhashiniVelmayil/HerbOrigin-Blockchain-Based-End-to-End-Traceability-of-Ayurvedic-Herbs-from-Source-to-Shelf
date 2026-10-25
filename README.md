@@ -42,11 +42,6 @@ HerbOrigin is a blockchain-based platform designed to track Ayurvedic herbs from
 - Database: Update with the database used
 - Geolocation: Location tracking technology
 
-## 👥 Team Members
-
-- Team Member 1: Seema
-- Team Member 2: [Friend's Name]
-
 ## 🚀 Future Enhancements
 
 - QR code-based herb verification
