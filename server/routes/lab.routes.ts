@@ -38,10 +38,17 @@ labRouter.post('/', authenticateToken, (req: AuthenticatedRequest, res: Response
       moisturePercent,
       pesticideResiduePpm,
       heavyMetalsPass,
+      leadPpm,
+      arsenicPpm,
+      cadmiumPpm,
+      mercuryPpm,
+      microbialCountCfu,
+      dnaBarcodeVerified,
       ashValuePercent,
       activePhytochemical,
       activePhytochemicalPercent,
       overallStatus,
+      confirmedBotanicalName,
       notes,
     } = req.body;
 
@@ -54,7 +61,8 @@ labRouter.post('/', authenticateToken, (req: AuthenticatedRequest, res: Response
       return res.status(404).json({ error: 'Referenced herb batch not found.' });
     }
 
-    if (!labName || typeof labName !== 'string' || labName.trim().length === 0) {
+    const effectiveLabName = (labName && typeof labName === 'string' && labName.trim()) || user.organization || `${user.fullName} Lab`;
+    if (!effectiveLabName) {
       return res.status(400).json({ error: 'Accredited testing laboratory name is required.' });
     }
 
@@ -78,19 +86,25 @@ labRouter.post('/', authenticateToken, (req: AuthenticatedRequest, res: Response
       return res.status(400).json({ error: 'Valid active phytochemical percentage is required.' });
     }
 
+    const parsedMicrobial = microbialCountCfu !== undefined ? parseFloat(microbialCountCfu) : undefined;
+    const parsedLead = leadPpm !== undefined ? parseFloat(leadPpm) : undefined;
+    const parsedArsenic = arsenicPpm !== undefined ? parseFloat(arsenicPpm) : undefined;
+    const parsedCadmium = cadmiumPpm !== undefined ? parseFloat(cadmiumPpm) : undefined;
+    const parsedMercury = mercuryPpm !== undefined ? parseFloat(mercuryPpm) : undefined;
+
     const validStatuses = ['Approved', 'Rejected', 'Quarantined'];
     const status = validStatuses.includes(overallStatus) ? overallStatus : 'Approved';
 
     const testId = `lab_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     const certHash = crypto
       .createHash('sha256')
-      .update(`CERT_${batch.batchNumber}_${labName}_${parsedMoisture}_${parsedPhytoPercent}_${Date.now()}`)
+      .update(`CERT_${batch.batchNumber}_${effectiveLabName}_${parsedMoisture}_${parsedPhytoPercent}_${Date.now()}`)
       .digest('hex');
 
     const ledgerTx = db.recordLedgerTransaction({
       type: 'LAB_VERIFICATION',
       entityId: testId,
-      description: `Lab test [${status}] by ${labName} for batch ${batch.batchNumber}: Phytochemical ${activePhytochemical} = ${parsedPhytoPercent}%`,
+      description: `Lab test [${status}] by ${effectiveLabName} for batch ${batch.batchNumber}: Phytochemical ${activePhytochemical} = ${parsedPhytoPercent}%`,
       actor: user.id,
     });
 
@@ -99,12 +113,18 @@ labRouter.post('/', authenticateToken, (req: AuthenticatedRequest, res: Response
       batchId: batch.id,
       batchNumber: batch.batchNumber,
       testDate: new Date().toISOString().split('T')[0],
-      labName: labName.trim(),
+      labName: effectiveLabName,
       verifierUserId: user.id,
       verifierName: user.fullName,
       moisturePercent: parsedMoisture,
       pesticideResiduePpm: parsedPesticide,
       heavyMetalsPass: Boolean(heavyMetalsPass),
+      leadPpm: parsedLead,
+      arsenicPpm: parsedArsenic,
+      cadmiumPpm: parsedCadmium,
+      mercuryPpm: parsedMercury,
+      microbialCountCfu: parsedMicrobial,
+      dnaBarcodeVerified: Boolean(dnaBarcodeVerified),
       ashValuePercent: parsedAsh,
       activePhytochemical: activePhytochemical ? String(activePhytochemical).trim() : 'Active Phytochemical Marker (HPLC)',
       activePhytochemicalPercent: parsedPhytoPercent,
@@ -118,9 +138,18 @@ labRouter.post('/', authenticateToken, (req: AuthenticatedRequest, res: Response
 
     db.addLabTest(newLabTest);
 
-    // Update batch status accordingly
+    // Update batch status and botanical verification status
     const newBatchStatus = status === 'Approved' ? 'Approved' : status === 'Rejected' ? 'Rejected' : 'InTesting';
-    db.updateBatch(batch.id, { status: newBatchStatus });
+    const batchUpdates: Partial<HerbBatchRecord> = { status: newBatchStatus };
+    if (status === 'Approved') {
+      batchUpdates.botanicalVerificationStatus = 'Certified Authentic';
+      if (confirmedBotanicalName && typeof confirmedBotanicalName === 'string' && confirmedBotanicalName.trim().length > 0) {
+        batchUpdates.botanicalName = confirmedBotanicalName.trim();
+      }
+    } else if (status === 'Rejected') {
+      batchUpdates.botanicalVerificationStatus = 'Rejected';
+    }
+    db.updateBatch(batch.id, batchUpdates);
 
     // Add supply chain event
     const event: SupplyChainEventRecord = {
@@ -129,7 +158,7 @@ labRouter.post('/', authenticateToken, (req: AuthenticatedRequest, res: Response
       batchNumber: batch.batchNumber,
       eventType: 'LAB_TEST',
       title: `Lab Verification: ${status.toUpperCase()}`,
-      description: `Tested by ${labName}. Purity status: ${status}. Active marker: ${newLabTest.activePhytochemical} (${parsedPhytoPercent}%). Certificate: ${certHash.substring(0, 16)}...`,
+      description: `Tested by ${labName}. Purity status: ${status}. Active marker: ${newLabTest.activePhytochemical} (${parsedPhytoPercent}%). Heavy metals: ${heavyMetalsPass ? 'Passed' : 'Failed'}. Microbial: ${parsedMicrobial !== undefined ? parsedMicrobial + ' CFU/g' : 'Tested'}. Certificate: ${certHash.substring(0, 16)}...`,
       location: labName,
       recordedByUserId: user.id,
       recordedByName: user.fullName,

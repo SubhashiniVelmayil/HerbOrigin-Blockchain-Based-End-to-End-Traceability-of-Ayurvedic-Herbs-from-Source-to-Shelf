@@ -29,23 +29,24 @@ export const ProcessorModule: React.FC<ProcessorModuleProps> = ({
   const { user } = useAuth();
   const { t } = useLanguage();
 
-  const [selectedBatchId, setSelectedBatchId] = useState<string>(batches[0]?.id || '');
+  const eligibleBatches = batches.filter((b) => b.status === 'Collected' || b.status === 'InProcessing');
+  const availableBatches = eligibleBatches.length > 0 ? eligibleBatches : batches;
+
+  const [selectedBatchId, setSelectedBatchId] = useState<string>(availableBatches[0]?.id || '');
   const [processingType, setProcessingType] = useState('Solar Dehydration & Moisture Reduction');
   const [facilityLocation, setFacilityLocation] = useState(
-    user?.location || 'Coimbatore Certified Ayurvedic Primary Processing Center'
+    user?.location || user?.organization || 'Coimbatore Certified Ayurvedic Primary Processing Center'
   );
   const [temperatureCelsius, setTemperatureCelsius] = useState('42');
   const [reducedMoisture, setReducedMoisture] = useState('7.8');
   const [equipmentDetails, setEquipmentDetails] = useState('Indirect Solar Tunnel Dryer with HEPA air intake');
-  const [notes, setNotes] = useState(
-    'Roots cleaned using pressurized treated mountain water, dried under controlled temperature (<45°C) to safeguard withanolide glycosides.'
-  );
+  const [notes, setNotes] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const selectedBatch = batches.find((b) => b.id === selectedBatchId);
+  const selectedBatch = availableBatches.find((b) => b.id === selectedBatchId) || batches.find((b) => b.id === selectedBatchId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

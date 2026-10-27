@@ -47,6 +47,13 @@ export const BatchList: React.FC<BatchListProps> = ({
   const { user, hasRole } = useAuth();
   const { t } = useLanguage();
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [onlyMyBatches, setOnlyMyBatches] = useState<boolean>(user?.role === 'Collector');
+
+  const myBatchesCount = user ? batches.filter((b) => b.collectorId === user.id).length : 0;
+  const displayedBatches =
+    onlyMyBatches && user && user.role === 'Collector'
+      ? batches.filter((b) => b.collectorId === user.id)
+      : batches;
 
   const getStatusBadge = (status: BatchStatus) => {
     switch (status) {
@@ -69,6 +76,40 @@ export const BatchList: React.FC<BatchListProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Collector Filter Header */}
+      {user && user.role === 'Collector' && (
+        <div className="flex items-center justify-between bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200/70 text-xs">
+          <div className="flex items-center gap-2">
+            <Leaf className="w-4 h-4 text-emerald-700" />
+            <span className="font-semibold text-emerald-950">Farmer Workstation Filter:</span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setOnlyMyBatches(true)}
+              className={`px-3 py-1 rounded-xl font-semibold transition-colors ${
+                onlyMyBatches
+                  ? 'bg-emerald-700 text-white shadow-xs'
+                  : 'bg-white text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
+              }`}
+            >
+              My Harvest Batches ({myBatchesCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => setOnlyMyBatches(false)}
+              className={`px-3 py-1 rounded-xl font-semibold transition-colors ${
+                !onlyMyBatches
+                  ? 'bg-emerald-700 text-white shadow-xs'
+                  : 'bg-white text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
+              }`}
+            >
+              All Registry Batches ({batches.length})
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Search and Action Bar */}
       <div className="bg-white p-4 rounded-2xl shadow-xs border border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Search */}
@@ -107,10 +148,10 @@ export const BatchList: React.FC<BatchListProps> = ({
             <button
               type="button"
               onClick={onNavigateToCollector}
-              className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors whitespace-nowrap"
+              className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors whitespace-nowrap cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Register Batch</span>
+              <Plus className="w-4 h-4" />
+              <span>{t("registerNewHerbBatch")}</span>
             </button>
           )}
         </div>
@@ -119,7 +160,7 @@ export const BatchList: React.FC<BatchListProps> = ({
       {/* Batch Cards Grid */}
       {loading ? (
         <div className="p-12 text-center text-xs text-zinc-500">Loading batches...</div>
-      ) : batches.length === 0 ? (
+      ) : displayedBatches.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center border border-zinc-200 shadow-xs space-y-3">
           <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
             <Leaf className="w-6 h-6" />
@@ -137,13 +178,13 @@ export const BatchList: React.FC<BatchListProps> = ({
               className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-700 text-white text-xs font-semibold rounded-xl hover:bg-emerald-800"
             >
               <Plus className="w-4 h-4" />
-              <span>Create New Batch</span>
+              <span>{t("registerNewHerbBatch")}</span>
             </button>
           )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {batches.map((b) => {
+          {displayedBatches.map((b) => {
             const canEdit =
               user && (user.role === 'Admin' || (user.id === b.collectorId && b.status !== 'Approved'));
             const canDelete =

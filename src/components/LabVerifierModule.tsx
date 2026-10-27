@@ -36,9 +36,16 @@ export const LabVerifierModule: React.FC<LabVerifierModuleProps> = ({
   const [moisturePercent, setMoisturePercent] = useState('8.2');
   const [pesticideResiduePpm, setPesticideResiduePpm] = useState('0.003');
   const [heavyMetalsPass, setHeavyMetalsPass] = useState(true);
+  const [leadPpm, setLeadPpm] = useState('0.42');
+  const [arsenicPpm, setArsenicPpm] = useState('0.15');
+  const [cadmiumPpm, setCadmiumPpm] = useState('0.02');
+  const [mercuryPpm, setMercuryPpm] = useState('0.01');
+  const [microbialCountCfu, setMicrobialCountCfu] = useState('150');
+  const [dnaBarcodeVerified, setDnaBarcodeVerified] = useState(true);
   const [ashValuePercent, setAshValuePercent] = useState('5.4');
   const [activePhytochemical, setActivePhytochemical] = useState('Withanolides A & B (HPLC)');
   const [activePhytochemicalPercent, setActivePhytochemicalPercent] = useState('2.15');
+  const [confirmedBotanicalName, setConfirmedBotanicalName] = useState('');
   const [overallStatus, setOverallStatus] = useState<'Approved' | 'Rejected' | 'Quarantined'>('Approved');
   const [notes, setNotes] = useState(
     'Meets and exceeds Ayurvedic Pharmacopoeia of India (API) standards. Purity: Grade A organic medicinal quality.'
@@ -54,15 +61,29 @@ export const LabVerifierModule: React.FC<LabVerifierModuleProps> = ({
     setSelectedBatchId(id);
     const b = batches.find((x) => x.id === id);
     if (b) {
+      if (b.botanicalName) {
+        setConfirmedBotanicalName(b.botanicalName);
+      }
       if (b.herbName.toLowerCase().includes('ashwagandha')) {
         setActivePhytochemical('Withanolides A & B (HPLC)');
         setActivePhytochemicalPercent('2.15');
+        if (!confirmedBotanicalName) setConfirmedBotanicalName('Withania somnifera');
       } else if (b.herbName.toLowerCase().includes('tulsi')) {
         setActivePhytochemical('Eugenol & Ursolic Acid (GC-MS)');
         setActivePhytochemicalPercent('1.45');
+        if (!confirmedBotanicalName) setConfirmedBotanicalName('Ocimum sanctum');
       } else if (b.herbName.toLowerCase().includes('brahmi')) {
         setActivePhytochemical('Bacosides A & B (HPTLC)');
         setActivePhytochemicalPercent('3.80');
+        if (!confirmedBotanicalName) setConfirmedBotanicalName('Bacopa monnieri');
+      } else if (b.herbName.toLowerCase().includes('amla') || b.herbName.toLowerCase().includes('nellikai')) {
+        setActivePhytochemical('Ascorbic Acid & Gallic Acid (HPLC)');
+        setActivePhytochemicalPercent('4.20');
+        if (!confirmedBotanicalName) setConfirmedBotanicalName('Phyllanthus emblica');
+      } else if (b.herbName.toLowerCase().includes('neem') || b.herbName.toLowerCase().includes('veppai')) {
+        setActivePhytochemical('Azadirachtin (HPLC)');
+        setActivePhytochemicalPercent('0.35');
+        if (!confirmedBotanicalName) setConfirmedBotanicalName('Azadirachta indica');
       }
     }
   };
@@ -91,9 +112,16 @@ export const LabVerifierModule: React.FC<LabVerifierModuleProps> = ({
         moisturePercent: parseFloat(moisturePercent),
         pesticideResiduePpm: parseFloat(pesticideResiduePpm),
         heavyMetalsPass,
+        leadPpm: parseFloat(leadPpm),
+        arsenicPpm: parseFloat(arsenicPpm),
+        cadmiumPpm: parseFloat(cadmiumPpm),
+        mercuryPpm: parseFloat(mercuryPpm),
+        microbialCountCfu: parseFloat(microbialCountCfu),
+        dnaBarcodeVerified,
         ashValuePercent: parseFloat(ashValuePercent),
         activePhytochemical: activePhytochemical.trim(),
         activePhytochemicalPercent: parseFloat(activePhytochemicalPercent),
+        confirmedBotanicalName: confirmedBotanicalName.trim() || undefined,
         overallStatus,
         notes: notes.trim(),
       };
@@ -239,34 +267,111 @@ export const LabVerifierModule: React.FC<LabVerifierModuleProps> = ({
             </div>
           </div>
 
-          {/* Heavy Metals Compliance Switch */}
-          <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold text-zinc-800">{t('heavyMetalsCheck')}</p>
-              <p className="text-[11px] text-zinc-500">
-                Lead (&lt;10ppm), Arsenic (&lt;3ppm), Cadmium (&lt;0.3ppm), Mercury (&lt;1ppm) tested via ICP-MS
-              </p>
+          {/* Heavy Metals Compliance Switch & ICP-MS Values */}
+          <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-zinc-800">{t('heavyMetalsCheck')}</p>
+                <p className="text-[11px] text-zinc-500">
+                  Lead (&lt;10ppm), Arsenic (&lt;3ppm), Cadmium (&lt;0.3ppm), Mercury (&lt;1ppm) tested via Inductively Coupled Plasma Mass Spectrometry (ICP-MS)
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={heavyMetalsPass}
+                  onChange={(e) => setHeavyMetalsPass(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+              </label>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-zinc-200/60 text-xs">
+              <div>
+                <label className="block text-[11px] text-zinc-500 mb-0.5">Lead (Pb) ppm</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={leadPpm}
+                  onChange={(e) => setLeadPpm(e.target.value)}
+                  className="w-full px-2 py-1 text-xs border border-zinc-300 rounded-lg bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-zinc-500 mb-0.5">Arsenic (As) ppm</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={arsenicPpm}
+                  onChange={(e) => setArsenicPpm(e.target.value)}
+                  className="w-full px-2 py-1 text-xs border border-zinc-300 rounded-lg bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-zinc-500 mb-0.5">Cadmium (Cd) ppm</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={cadmiumPpm}
+                  onChange={(e) => setCadmiumPpm(e.target.value)}
+                  className="w-full px-2 py-1 text-xs border border-zinc-300 rounded-lg bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-zinc-500 mb-0.5">Mercury (Hg) ppm</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={mercuryPpm}
+                  onChange={(e) => setMercuryPpm(e.target.value)}
+                  className="w-full px-2 py-1 text-xs border border-zinc-300 rounded-lg bg-white"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Microbial Limits & DNA Barcode Verification */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-200">
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                Total Aerobic Microbial Count (TAMC CFU/g)
+              </label>
+              <input
+                type="number"
+                value={microbialCountCfu}
+                onChange={(e) => setMicrobialCountCfu(e.target.value)}
+                placeholder="e.g. 150"
+                className="w-full px-3 py-1.5 text-xs border border-zinc-300 rounded-lg bg-white"
+              />
+              <span className="text-[10px] text-zinc-500">Ayurvedic Pharmacopoeia limit: &lt; 1000 CFU/g</span>
+            </div>
+
+            <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-200 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-zinc-800">DNA Barcode / Botanical Identity</p>
+                <p className="text-[10px] text-zinc-500">
+                  Matches reference herbarium voucher rbcL/matK gene sequence
+                </p>
+              </div>
               <input
                 type="checkbox"
-                checked={heavyMetalsPass}
-                onChange={(e) => setHeavyMetalsPass(e.target.checked)}
-                className="sr-only peer"
+                checked={dnaBarcodeVerified}
+                onChange={(e) => setDnaBarcodeVerified(e.target.checked)}
+                className="w-4 h-4 text-emerald-600 rounded"
               />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-            </label>
+            </div>
           </div>
         </div>
 
-        {/* Section: Phytochemical Assay */}
+        {/* Section: Phytochemical Assay & Botanical Name Confirmation */}
         <div className="space-y-4 pt-4 border-t border-zinc-100">
           <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-blue-600" />
             Active Phytochemical Assay (High-Performance Liquid Chromatography)
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-semibold text-zinc-700 mb-1">{t('activeMarkerName')} *</label>
               <input
@@ -291,6 +396,17 @@ export const LabVerifierModule: React.FC<LabVerifierModuleProps> = ({
                 className="w-full px-3.5 py-2 text-xs border border-zinc-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
               />
             </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">Confirmed Botanical Species Name</label>
+              <input
+                type="text"
+                value={confirmedBotanicalName}
+                onChange={(e) => setConfirmedBotanicalName(e.target.value)}
+                placeholder="e.g. Withania somnifera"
+                className="w-full px-3.5 py-2 text-xs border border-zinc-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-hidden font-mono italic"
+              />
+            </div>
           </div>
         </div>
 
@@ -302,12 +418,23 @@ export const LabVerifierModule: React.FC<LabVerifierModuleProps> = ({
               <select
                 value={overallStatus}
                 onChange={(e) => setOverallStatus(e.target.value as any)}
-                className="w-full px-3.5 py-2 text-xs border border-zinc-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-hidden bg-white font-bold"
+                className={`w-full px-3.5 py-2 text-xs border rounded-xl focus:outline-hidden bg-white font-bold ${
+                  overallStatus === 'Approved'
+                    ? 'border-emerald-500 text-emerald-900 bg-emerald-50/30'
+                    : overallStatus === 'Rejected'
+                    ? 'border-rose-500 text-rose-900 bg-rose-50/30'
+                    : 'border-amber-500 text-amber-900'
+                }`}
               >
-                <option value="Approved">Approved (Certified Therapeutic Grade)</option>
-                <option value="Rejected">Rejected (Exceeds Contaminant Limits)</option>
+                <option value="Approved">Approved (Certified Authentic Therapeutic Grade)</option>
+                <option value="Rejected">Rejected (Exceeds Contaminant Limits / Sub-standard)</option>
                 <option value="Quarantined">Quarantined (Secondary Assay Required)</option>
               </select>
+              {overallStatus === 'Rejected' && (
+                <p className="text-[11px] text-rose-600 mt-1 font-medium">
+                  Warning: Rejecting this batch will lock it as Quarantined. Drug manufacturers will be barred from formulating it into medicine.
+                </p>
+              )}
             </div>
 
             <div>

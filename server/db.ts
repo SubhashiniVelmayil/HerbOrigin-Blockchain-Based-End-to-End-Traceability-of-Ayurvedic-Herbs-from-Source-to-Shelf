@@ -24,23 +24,36 @@ export interface HerbBatchRecord {
   id: string;
   batchNumber: string;
   herbName: string;
-  botanicalName: string;
+  botanicalName?: string;
+  botanicalVerificationStatus?: 'Unverified' | 'Certified Authentic' | 'Rejected';
+  quantity?: number;
+  unit?: 'kg' | 'g';
   quantityKg: number;
   moisturePercent: number;
   collectionDate: string;
+  collectionTime?: string;
   collectorId: string;
   collectorName: string;
   gpsLatitude: number;
   gpsLongitude: number;
   region: string;
   elevationMeters?: number;
+  collectionMethod?: string;
+  herbPart?: string;
   harvestMethod: string;
   qualityGrade: string; // 'A', 'B', 'Pending'
   photoUrl?: string;
+  photoVerificationNote?: string;
+  farmerNotes?: string;
   notes?: string;
+  locationSource?: string;
+  locationAccuracyMeters?: number;
+  isLocationConfirmed?: boolean;
+  locationConfirmedAt?: string;
   status: 'Collected' | 'InProcessing' | 'Processed' | 'InTesting' | 'Approved' | 'Rejected' | 'Formulated';
   blockchainHash: string;
   blockNumber: number;
+  isDemo?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -60,6 +73,7 @@ export interface SupplyChainEventRecord {
   evidenceHash?: string;
   txHash: string;
   blockNumber: number;
+  isDemo?: boolean;
 }
 
 export interface LabTestRecord {
@@ -73,6 +87,12 @@ export interface LabTestRecord {
   moisturePercent: number; // Max allowable per API e.g. 8-12%
   pesticideResiduePpm: number; // ppm limit e.g. < 0.05
   heavyMetalsPass: boolean; // Lead, Arsenic, Cadmium, Mercury within limits
+  leadPpm?: number;
+  arsenicPpm?: number;
+  cadmiumPpm?: number;
+  mercuryPpm?: number;
+  microbialCountCfu?: number; // Total aerobic count CFU/g (Limit < 1000)
+  dnaBarcodeVerified?: boolean; // Species authentication via DNA barcoding
   ashValuePercent: number;
   activePhytochemical: string; // e.g. Withanolides A & B
   activePhytochemicalPercent: number; // e.g. 1.85%
@@ -81,6 +101,7 @@ export interface LabTestRecord {
   certificateHash: string;
   txHash: string;
   blockNumber: number;
+  isDemo?: boolean;
   createdAt: string;
 }
 
@@ -141,6 +162,7 @@ export interface DatabaseSchema {
   auditLogs: AuditLogRecord[];
   ledger: LedgerBlock[];
   passwordResetTokens: { token: string; email: string; expiresAt: string }[];
+  nextBatchSequence: number;
 }
 
 function calculateHash(data: string): string {
@@ -166,7 +188,19 @@ class Database {
     if (fs.existsSync(DB_FILE)) {
       try {
         const content = fs.readFileSync(DB_FILE, 'utf-8');
-        return JSON.parse(content);
+        const parsed = JSON.parse(content);
+        if (!parsed.nextBatchSequence) {
+          let maxSeq = 2;
+          for (const b of (parsed.batches || [])) {
+            const m = b.batchNumber && b.batchNumber.match(/HERB-\d{4}-(\d+)/);
+            if (m) {
+              const n = parseInt(m[1], 10);
+              if (n > maxSeq) maxSeq = n;
+            }
+          }
+          parsed.nextBatchSequence = maxSeq + 1;
+        }
+        return parsed;
       } catch (err) {
         console.error('Failed to parse database.json, re-initializing', err);
       }
@@ -241,6 +275,34 @@ class Database {
       createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
     };
 
+    const processorUser: UserRecord = {
+      id: 'usr_proc_001',
+      fullName: 'Senthil Kumar',
+      email: 'processor@ayurtrace.org',
+      passwordHash: collectorPasswordHash,
+      role: 'Processor',
+      phone: '+91 94441 55678',
+      organization: 'Coimbatore Herbal Dehydration & Milling Facility',
+      location: 'Coimbatore, Tamil Nadu',
+      licenseNumber: 'TN-PROC-AYUSH-441',
+      isApproved: true,
+      createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+    };
+
+    const mfgUser: UserRecord = {
+      id: 'usr_mfg_001',
+      fullName: 'Dr. Rajesh Vaidya, BAMS',
+      email: 'mfg@vaidyaherbals.com',
+      passwordHash: collectorPasswordHash,
+      role: 'Manufacturer',
+      phone: '+91 98412 88990',
+      organization: 'Vaidya Herbals Ayurvedic Pharmacy Ltd.',
+      location: 'Madurai, Tamil Nadu',
+      licenseNumber: 'AYUSH-MFG-TN-892',
+      isApproved: true,
+      createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+    };
+
     const batch1Id = 'batch_ash_001';
     const batch1Tx = calculateHash(`tx_batch_ash_001_${collectorUser.id}`);
     const batch1: HerbBatchRecord = {
@@ -248,6 +310,8 @@ class Database {
       batchNumber: 'HO-ASH-2025-001',
       herbName: 'Ashwagandha (Indian Ginseng)',
       botanicalName: 'Withania somnifera',
+      botanicalVerificationStatus: 'Certified Authentic',
+      isDemo: true,
       quantityKg: 120,
       moisturePercent: 8.4,
       collectionDate: new Date(Date.now() - 86400000 * 6).toISOString().split('T')[0],
@@ -275,6 +339,8 @@ class Database {
       batchNumber: 'HO-TUL-2025-002',
       herbName: 'Krishna Tulsi (Holy Basil)',
       botanicalName: 'Ocimum sanctum',
+      botanicalVerificationStatus: 'Unverified',
+      isDemo: true,
       quantityKg: 85,
       moisturePercent: 9.1,
       collectionDate: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0],
@@ -436,7 +502,7 @@ class Database {
     ];
 
     return {
-      users: [adminUser, collectorUser, labUser],
+      users: [adminUser, collectorUser, processorUser, labUser, mfgUser],
       batches: [batch1, batch2],
       events,
       labTests,
@@ -456,10 +522,31 @@ class Database {
       ],
       ledger,
       passwordResetTokens: [],
+      nextBatchSequence: 3,
     };
   }
 
   // Database Accessors
+  public generateNextBatchNumber(): string {
+    const year = new Date().getFullYear();
+    if (!this.data.nextBatchSequence) {
+      let maxSeq = 0;
+      for (const b of this.data.batches) {
+        const match = b.batchNumber.match(/HERB-\d{4}-(\d+)/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (num > maxSeq) maxSeq = num;
+        }
+      }
+      this.data.nextBatchSequence = Math.max(maxSeq + 1, 1);
+    }
+    const seq = this.data.nextBatchSequence;
+    const batchNumber = `HERB-${year}-${String(seq).padStart(6, "0")}`;
+    this.data.nextBatchSequence = seq + 1;
+    this.save();
+    return batchNumber;
+  }
+
   public getUsers(): UserRecord[] {
     return this.data.users;
   }

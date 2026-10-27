@@ -135,7 +135,14 @@ export const BatchDetailModal: React.FC<BatchDetailModalProps> = ({
                 </span>
               </div>
               <h2 className="text-xl font-bold font-serif text-white">{batch?.herbName}</h2>
-              <p className="text-xs text-emerald-200/90 italic font-mono">{batch?.botanicalName}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-xs text-emerald-200/90 italic font-mono">
+                  {batch?.botanicalName || "Botanical Species: Unverified"}
+                </span>
+                <span className="text-[10px] bg-amber-400/20 text-amber-200 px-1.5 py-0.2 rounded border border-amber-300/30">
+                  {batch?.status === "Approved" ? "Certified" : "Unverified"}
+                </span>
+              </div>
             </div>
 
             {/* Quick Actions */}
@@ -209,8 +216,8 @@ export const BatchDetailModal: React.FC<BatchDetailModalProps> = ({
               <div className="md:col-span-2 space-y-3">
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-200">
-                    <span className="text-zinc-500 block text-[11px]">{t('quantityKg')}</span>
-                    <span className="font-bold text-zinc-900 text-sm">{batch.quantityKg} kg</span>
+                    <span className="text-zinc-500 block text-[11px]">{t('quantity')}</span>
+                    <span className="font-bold text-zinc-900 text-sm">{batch.quantity || batch.quantityKg} {batch.unit || "kg"} ({batch.quantityKg} kg)</span>
                   </div>
                   <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-200">
                     <span className="text-zinc-500 block text-[11px]">{t('moisturePercent')}</span>
@@ -225,6 +232,28 @@ export const BatchDetailModal: React.FC<BatchDetailModalProps> = ({
                     <span className="font-medium text-zinc-800 truncate block">{batch.collectorName}</span>
                   </div>
                 </div>
+
+                                {/* Herb Part & Method */}
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200">
+                    <span className="text-zinc-500 block text-[11px]">Collection Method</span>
+                    <span className="font-semibold text-zinc-800">{batch.collectionMethod || "Wild Collected"}</span>
+                  </div>
+                  <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200">
+                    <span className="text-zinc-500 block text-[11px]">Plant Part</span>
+                    <span className="font-semibold text-zinc-800">{batch.herbPart || "Whole Plant"}</span>
+                  </div>
+                </div>
+
+                {batch.photoUrl && (
+                  <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-200 text-xs flex items-center gap-3">
+                    <img src={batch.photoUrl} alt="Field Herb" className="w-16 h-16 object-cover rounded-lg border border-zinc-300 shadow-xs" />
+                    <div>
+                      <span className="text-xs font-bold text-zinc-900 block">Field Documentation Photo</span>
+                      <p className="text-[10px] text-zinc-500 italic">Field photo captured at harvest. Note: Physical photo does not constitute certified laboratory botanical verification.</p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Geolocation Tagging */}
                 <div className="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100 text-xs">

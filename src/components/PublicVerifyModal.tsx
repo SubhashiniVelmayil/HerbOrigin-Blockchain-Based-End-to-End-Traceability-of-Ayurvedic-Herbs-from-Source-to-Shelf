@@ -117,78 +117,75 @@ export const PublicVerifyModal: React.FC<PublicVerifyModalProps> = ({
             </button>
           </form>
 
-          {/* Quick tester pills */}
-          <div className="flex items-center gap-2 mt-3 text-xs text-zinc-500">
-            <span>Test Codes:</span>
-            <button
-              type="button"
-              onClick={() => {
-                setInputCode('HO-ASH-2025-001');
-                handleVerify('HO-ASH-2025-001');
-              }}
-              className="font-mono text-[11px] bg-white border border-zinc-200 px-2 py-0.5 rounded text-emerald-800 hover:bg-emerald-50 font-semibold"
-            >
-              HO-ASH-2025-001
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setInputCode('HO-TUL-2025-002');
-                handleVerify('HO-TUL-2025-002');
-              }}
-              className="font-mono text-[11px] bg-white border border-zinc-200 px-2 py-0.5 rounded text-emerald-800 hover:bg-emerald-50 font-semibold"
-            >
-              HO-TUL-2025-002
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setInputCode('PRD-ASH-CHURNA-500');
-                handleVerify('PRD-ASH-CHURNA-500');
-              }}
-              className="font-mono text-[11px] bg-white border border-zinc-200 px-2 py-0.5 rounded text-emerald-800 hover:bg-emerald-50 font-semibold"
-            >
-              PRD-ASH-CHURNA-500
-            </button>
+          {/* Helper hint */}
+          <div className="flex items-center justify-between mt-2.5 text-xs text-zinc-500">
+            <span>Enter any authentic Herb Batch Number (e.g. <code className="font-mono text-zinc-700 font-semibold">HERB-2026-...</code>) or Product Code (<code className="font-mono text-zinc-700 font-semibold">PRD-...</code>)</span>
           </div>
         </div>
 
         {/* Result Area */}
         <div className="p-6 max-h-[65vh] overflow-y-auto space-y-6">
           {error && (
-            <div className="p-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-2 text-center">
-              <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
-                <AlertTriangle className="w-5 h-5" />
+            <div className="p-5 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-900 text-xs space-y-2 text-center animate-in fade-in">
+              <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+                <AlertTriangle className="w-6 h-6" />
               </div>
-              <h4 className="font-bold text-sm text-rose-900">{t('counterfeitWarning')}</h4>
-              <p className="text-rose-700 max-w-md mx-auto">{error}</p>
+              <h4 className="font-bold text-base text-rose-900">{t('counterfeitWarning')}</h4>
+              <p className="text-rose-700 max-w-md mx-auto leading-relaxed">{error}</p>
+              <div className="pt-2 text-[11px] text-rose-600 font-mono">
+                Code verified against immutable blockchain state: Unauthenticated / Not Recorded.
+              </div>
             </div>
           )}
 
           {result && result.verified && (
             <div className="space-y-6 animate-in fade-in zoom-in-95">
-              {/* Authenticity Certificate Card */}
-              <div className="bg-linear-to-br from-emerald-50 to-teal-50 border-2 border-emerald-400/80 rounded-3xl p-6 shadow-sm relative overflow-hidden">
+              {/* Authenticity / Status Card */}
+              <div
+                className={`border-2 rounded-3xl p-6 shadow-sm relative overflow-hidden ${
+                  result.certificationStatus === 'CERTIFIED_AUTHENTIC'
+                    ? 'bg-linear-to-br from-emerald-50 to-teal-50 border-emerald-400'
+                    : result.certificationStatus === 'REJECTED_FAILED_TESTS'
+                    ? 'bg-linear-to-br from-rose-50 to-orange-50 border-rose-400'
+                    : 'bg-linear-to-br from-amber-50 to-yellow-50 border-amber-400'
+                }`}
+              >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 font-mono">
-                        {result.type === 'PRODUCT' ? 'Finished Medicine' : 'Wild Raw Herb Batch'}
+                      <span
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          result.certificationStatus === 'CERTIFIED_AUTHENTIC'
+                            ? 'bg-emerald-500 animate-pulse'
+                            : result.certificationStatus === 'REJECTED_FAILED_TESTS'
+                            ? 'bg-rose-500'
+                            : 'bg-amber-500 animate-ping'
+                        }`}
+                      />
+                      <span className="text-xs font-bold uppercase tracking-wider text-zinc-700 font-mono">
+                        {result.type === 'PRODUCT' ? 'Finished Ayurvedic Medicine' : 'Raw Medicinal Herb Batch'}
                       </span>
                     </div>
                     <h3 className="text-xl font-bold text-zinc-900 font-serif">
                       {result.record.productName || result.record.herbName}
                     </h3>
-                    <p className="text-xs text-emerald-800 font-mono italic">
+                    <p className="text-xs text-zinc-700 font-mono italic">
                       {result.record.botanicalName || result.record.ayurvedicFormulation}
                     </p>
                   </div>
 
-                  <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-700 text-white rounded-full text-xs font-bold shadow-xs">
-                      <ShieldCheck className="w-4 h-4 text-emerald-300" />
-                      <span>Authenticity Certified</span>
+                  <div className="flex flex-col items-start sm:items-end">
+                    <div
+                      className={`flex items-center gap-1.5 px-3 py-1 text-white rounded-full text-xs font-bold shadow-xs ${
+                        result.certificationStatus === 'CERTIFIED_AUTHENTIC'
+                          ? 'bg-emerald-700'
+                          : result.certificationStatus === 'REJECTED_FAILED_TESTS'
+                          ? 'bg-rose-700'
+                          : 'bg-amber-600'
+                      }`}
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>{result.statusBadge}</span>
                     </div>
                     <span className="text-[10px] text-zinc-500 mt-1 font-mono">
                       Code: {result.record.productCode || result.record.batchNumber}
@@ -196,13 +193,26 @@ export const PublicVerifyModal: React.FC<PublicVerifyModalProps> = ({
                   </div>
                 </div>
 
+                {/* Honest Warning if Unverified or Rejected */}
+                {result.warning && (
+                  <div className="mt-3 p-3 rounded-xl bg-white/80 border border-amber-300 text-amber-900 text-xs flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+                    <span>{result.warning}</span>
+                  </div>
+                )}
+
                 {/* Privacy Protected Safe Location Banner */}
-                <div className="mt-4 pt-3 border-t border-emerald-200/60 flex items-start gap-2 text-[11px] text-emerald-900/90">
-                  <Lock className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Regional Privacy Safeguard Active:</strong> {t('safeLocationNotice')} Region:{' '}
-                    <strong>{result.record.region || 'Western Ghats Biodiversity Hotspot'}</strong>
-                  </span>
+                <div className="mt-4 pt-3 border-t border-zinc-200/60 flex items-start justify-between gap-2 text-[11px] text-zinc-700">
+                  <div className="flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                    <span>
+                      Origin: <strong>{result.record.region}</strong> • Cooperative:{' '}
+                      <strong>{result.record.collectorAffiliation}</strong>
+                    </span>
+                  </div>
+                  {result.record.collectorPhoneMasked && (
+                    <span className="font-mono text-zinc-500">Phone: {result.record.collectorPhoneMasked}</span>
+                  )}
                 </div>
               </div>
 

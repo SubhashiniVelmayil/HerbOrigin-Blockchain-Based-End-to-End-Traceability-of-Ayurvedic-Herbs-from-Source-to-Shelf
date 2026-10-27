@@ -28,27 +28,54 @@ export type BatchStatus =
   | 'Rejected'
   | 'Formulated';
 
+export type CollectionMethod = 'Cultivated' | 'Wild Collected';
+export type HerbPart =
+  | 'Leaves'
+  | 'Roots'
+  | 'Stem'
+  | 'Bark'
+  | 'Flowers'
+  | 'Seeds'
+  | 'Whole Plant'
+  | 'Other';
+export type WeightUnit = 'kg' | 'g';
+export type LocationSource = 'GPS_DEVICE' | 'MAP_PINPOINT' | 'MANUAL_ENTRY';
+export type BotanicalVerificationStatus = 'Unverified' | 'Certified Authentic' | 'Rejected';
+
 export interface HerbBatch {
   id: string;
   batchNumber: string;
   herbName: string;
-  botanicalName: string;
+  botanicalName?: string;
+  botanicalVerificationStatus?: BotanicalVerificationStatus;
+  collectionMethod?: CollectionMethod;
+  herbPart?: HerbPart;
+  quantity?: number;
+  unit?: WeightUnit;
   quantityKg: number;
   moisturePercent: number;
   collectionDate: string;
+  collectionTime?: string;
   collectorId: string;
   collectorName: string;
   gpsLatitude: number;
   gpsLongitude: number;
+  locationAccuracyMeters?: number;
+  locationSource?: LocationSource;
+  isLocationConfirmed?: boolean;
+  locationConfirmedAt?: string;
   region: string;
   elevationMeters?: number;
   harvestMethod: string;
   qualityGrade: string;
   photoUrl?: string;
+  photoVerificationNote?: string;
   notes?: string;
+  farmerNotes?: string;
   status: BatchStatus;
   blockchainHash: string;
   blockNumber: number;
+  isDemo?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -68,6 +95,7 @@ export interface SupplyChainEvent {
   evidenceHash?: string;
   txHash: string;
   blockNumber: number;
+  isDemo?: boolean;
 }
 
 export interface LabTest {
@@ -81,6 +109,12 @@ export interface LabTest {
   moisturePercent: number;
   pesticideResiduePpm: number;
   heavyMetalsPass: boolean;
+  leadPpm?: number;
+  arsenicPpm?: number;
+  cadmiumPpm?: number;
+  mercuryPpm?: number;
+  microbialCountCfu?: number;
+  dnaBarcodeVerified?: boolean;
   ashValuePercent: number;
   activePhytochemical: string;
   activePhytochemicalPercent: number;
@@ -89,6 +123,7 @@ export interface LabTest {
   certificateHash: string;
   txHash: string;
   blockNumber: number;
+  isDemo?: boolean;
   createdAt: string;
 }
 

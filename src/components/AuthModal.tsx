@@ -78,7 +78,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const strength = getPasswordStrength(password);
 
-  const fillQuickCredentials = (presetRole: 'Admin' | 'Collector' | 'Lab') => {
+  const [showDemoBox, setShowDemoBox] = useState(false);
+
+  const fillQuickCredentials = (presetRole: 'Admin' | 'Collector' | 'Processor' | 'Lab' | 'Manufacturer') => {
     clearError();
     setFormError(null);
     setMode('login');
@@ -88,8 +90,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     } else if (presetRole === 'Collector') {
       setEmail('murugan@westernghatsherbs.org');
       setPassword('Password123!');
+    } else if (presetRole === 'Processor') {
+      setEmail('processor@ayurtrace.org');
+      setPassword('Password123!');
     } else if (presetRole === 'Lab') {
       setEmail('ananya@ayurcertlabs.in');
+      setPassword('Password123!');
+    } else if (presetRole === 'Manufacturer') {
+      setEmail('mfg@vaidyaherbals.com');
       setPassword('Password123!');
     }
   };
@@ -255,38 +263,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </p>
         </div>
 
-        {/* Quick Testing Pre-sets */}
-        {mode === 'login' && (
-          <div className="bg-emerald-50/70 border-b border-emerald-100 px-6 py-2.5 flex items-center justify-between text-xs">
-            <span className="text-emerald-800 font-medium flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              Quick fill for testing:
-            </span>
-            <div className="flex gap-1.5">
-              <button
-                type="button"
-                onClick={() => fillQuickCredentials('Admin')}
-                className="px-2 py-0.5 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded font-semibold text-[11px] border border-purple-200"
-              >
-                Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => fillQuickCredentials('Collector')}
-                className="px-2 py-0.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded font-semibold text-[11px] border border-emerald-200"
-              >
-                Collector
-              </button>
-              <button
-                type="button"
-                onClick={() => fillQuickCredentials('Lab')}
-                className="px-2 py-0.5 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded font-semibold text-[11px] border border-blue-200"
-              >
-                Lab Verifier
-              </button>
-            </div>
-          </div>
-        )}
+
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
@@ -628,6 +605,66 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   {t('signIn')}
                 </button>
               </p>
+            )}
+          </div>
+
+          {/* Collapsible Demo Mode Box */}
+          <div className="pt-2 border-t border-zinc-100">
+            <button
+              type="button"
+              onClick={() => setShowDemoBox(!showDemoBox)}
+              className="w-full py-1 text-center text-[11px] text-zinc-500 hover:text-emerald-800 font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              <span>{showDemoBox ? 'Hide Demo Sandbox Accounts' : 'Looking for evaluation accounts? Click to view Demo Sandbox'}</span>
+            </button>
+            {showDemoBox && (
+              <div className="mt-2 bg-emerald-50/80 p-3 rounded-xl border border-emerald-200/70 text-[11px] space-y-2">
+                <div className="flex items-center justify-between text-emerald-900 font-semibold">
+                  <span>Demo Sandbox Stakeholder Accounts:</span>
+                  <span className="text-[10px] bg-emerald-200/80 px-1.5 py-0.2 rounded text-emerald-900 font-bold uppercase">Evaluation Only</span>
+                </div>
+                <p className="text-zinc-600 text-[10px]">
+                  You can self-register any unique account above with full database persistence. Or click below to test with pre-configured sandbox credentials:
+                </p>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => fillQuickCredentials('Collector')}
+                    className="px-2 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 rounded font-semibold text-[10px] border border-emerald-300"
+                  >
+                    🌿 Farmer / Collector
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fillQuickCredentials('Processor')}
+                    className="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded font-semibold text-[10px] border border-amber-300"
+                  >
+                    ⚙️ Processor
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fillQuickCredentials('Lab')}
+                    className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-900 rounded font-semibold text-[10px] border border-blue-300"
+                  >
+                    🔬 Lab Verifier
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fillQuickCredentials('Manufacturer')}
+                    className="px-2 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-900 rounded font-semibold text-[10px] border border-indigo-300"
+                  >
+                    🏭 Manufacturer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fillQuickCredentials('Admin')}
+                    className="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded font-semibold text-[10px] border border-purple-300"
+                  >
+                    🛡️ Admin
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </form>

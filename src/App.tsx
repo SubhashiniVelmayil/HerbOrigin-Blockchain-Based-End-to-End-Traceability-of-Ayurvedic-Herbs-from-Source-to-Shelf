@@ -162,11 +162,15 @@ function MainApp() {
               setEditingBatch(null);
               setActiveTab('batches');
             }}
-            onBatchCreated={() => {
+            onBatchCreated={(newBatch) => {
               setEditingBatch(null);
               loadData();
+              if (newBatch) {
+                setSelectedBatchId(newBatch.id);
+              }
               setActiveTab('batches');
             }}
+            onSelectBatch={(id) => setSelectedBatchId(id)}
             onOpenAuth={() => handleOpenAuth('login')}
           />
         )}

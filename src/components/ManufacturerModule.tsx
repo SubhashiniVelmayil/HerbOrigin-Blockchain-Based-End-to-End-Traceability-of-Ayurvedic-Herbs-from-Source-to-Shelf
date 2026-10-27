@@ -34,14 +34,12 @@ export const ManufacturerModule: React.FC<ManufacturerModuleProps> = ({
   const { user } = useAuth();
   const { t } = useLanguage();
 
-  const [productName, setProductName] = useState('Shuddha Ashwagandha Root Churna (Grade A Organic)');
-  const [ayurvedicFormulation, setAyurvedicFormulation] = useState('Ashwagandha Churna (Single Herb Classical Formulation)');
-  const [selectedBatchIds, setSelectedBatchIds] = useState<string[]>(
-    batches.filter((b) => b.status === 'Approved').slice(0, 1).map((b) => b.id)
-  );
+  const [productName, setProductName] = useState('');
+  const [ayurvedicFormulation, setAyurvedicFormulation] = useState('Classical Ayurvedic Herbal Churna / Vati / Taila');
+  const [selectedBatchIds, setSelectedBatchIds] = useState<string[]>([]);
   const [quantityUnits, setQuantityUnits] = useState('500');
   const [packagingType, setPackagingType] = useState('Amber Glass Jar with Nitrogen Flush Tamper-Evident Seal');
-  const [dosageInstructions, setDosageInstructions] = useState('3-6g with warm cow milk or honey twice daily before meals.');
+  const [dosageInstructions, setDosageInstructions] = useState('');
   const [shelfLifeMonths, setShelfLifeMonths] = useState('24');
 
   const [loading, setLoading] = useState(false);
@@ -50,12 +48,20 @@ export const ManufacturerModule: React.FC<ManufacturerModuleProps> = ({
   const [createdProduct, setCreatedProduct] = useState<Product | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
 
-  const approvedBatches = batches.filter((b) => b.status === 'Approved' || b.status === 'Formulated');
+  const approvedBatches = batches.filter((b) => b.status === 'Approved');
 
   const handleToggleBatch = (id: string) => {
-    setSelectedBatchIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setSelectedBatchIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      if (next.length > 0 && !productName) {
+        const first = batches.find((b) => b.id === next[0]);
+        if (first) {
+          setProductName(`Shuddha ${first.herbName} Extract Formulation`);
+          setDosageInstructions(`3-6g with warm water or honey twice daily after meals.`);
+        }
+      }
+      return next;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
